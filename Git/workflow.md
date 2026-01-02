@@ -125,6 +125,33 @@ Once approved:
 
 ## Working with Branches
 
+### Understanding Branches
+
+A branch is an independent line of development. The main branch (typically `main` or `master`) is your production-ready code. Feature branches are temporary branches where you develop new features or fixes.
+
+### Branching Strategy
+
+Follow a consistent naming convention:
+
+- `feature/feature-name` - New features
+- `bugfix/bug-name` - Bug fixes
+- `hotfix/issue-name` - Urgent production fixes
+- `refactor/description` - Code refactoring
+
+### Create a New Branch
+
+Create a branch from the current branch (usually `main`):
+
+```bash
+$ git checkout -b feature/your-feature-name
+```
+
+Or create a branch and track a remote branch:
+
+```bash
+$ git checkout -b feature/your-feature-name origin/feature/your-feature-name
+```
+
 ### List Branches
 
 View all local branches:
@@ -139,9 +166,29 @@ View all branches (local and remote):
 $ git branch -a
 ```
 
+View branches with last commit info:
+
+```bash
+$ git branch -v
+```
+
+### Switch Between Branches
+
+Switch to an existing branch:
+
+```bash
+$ git checkout branch-name
+```
+
+Or use the newer syntax:
+
+```bash
+$ git switch branch-name
+```
+
 ### Delete a Branch
 
-After merging, delete the local branch:
+Delete a local branch (only if fully merged):
 
 ```bash
 $ git branch -d feature/your-feature-name
@@ -153,10 +200,127 @@ Force delete (if not fully merged):
 $ git branch -D feature/your-feature-name
 ```
 
+Delete a remote branch:
+
+```bash
+$ git push origin --delete feature/your-feature-name
+```
+
 ### Rename a Branch
+
+Rename the current branch:
+
+```bash
+$ git branch -m new-branch-name
+```
+
+Rename a different branch:
 
 ```bash
 $ git branch -m old-branch-name new-branch-name
+```
+
+### Update Your Branch with Latest Changes
+
+Keep your branch up-to-date with the main branch using rebase (keeps history clean):
+
+```bash
+$ git rebase origin/main
+```
+
+Or using merge (creates a merge commit):
+
+```bash
+$ git merge origin/main
+```
+
+**Rebase vs Merge:**
+
+- **Rebase**: Replays your commits on top of the latest main branch. Creates a clean, linear history. Use for local branches.
+- **Merge**: Creates a merge commit combining both branches. Preserves complete history. Use when merging to main.
+
+---
+
+## Git Merge Strategies
+
+Merging combines changes from one branch into another. There are several merge strategies to understand:
+
+### 1. Merge Commit (Three-Way Merge)
+
+Creates a merge commit that ties together the histories of both branches. Use this when merging feature branches to main.
+
+```bash
+$ git merge feature/your-feature-name
+```
+
+This creates a commit like: "Merge branch 'feature/your-feature-name' into main"
+
+**Best for:** Integrating feature branches to main; preserves complete history
+
+### 2. Fast-Forward Merge
+
+When your branch has no diverging commits from main, Git simply moves the main pointer forward. No merge commit is created.
+
+```bash
+$ git merge feature/your-feature-name
+```
+
+**Best for:** Keeping history clean when working on isolated features
+
+To force a merge commit even if fast-forward is possible:
+
+```bash
+$ git merge --no-ff feature/your-feature-name
+```
+
+### 3. Squash Merge
+
+Combines all commits from the feature branch into a single commit on main. Useful for keeping main branch clean.
+
+```bash
+$ git merge --squash feature/your-feature-name
+```
+
+After squashing, you still need to commit:
+
+```bash
+$ git commit -m "Add new feature"
+```
+
+**Best for:** Keeping main branch history concise; useful for PR workflows
+
+### 4. Rebase and Merge
+
+Replays feature branch commits on top of main, then fast-forwards. Creates clean, linear history without merge commits.
+
+```bash
+$ git rebase main
+$ git checkout main
+$ git merge feature/your-feature-name
+```
+
+Or combined with one command (available in some Git versions):
+
+```bash
+$ git merge --rebase feature/your-feature-name
+```
+
+**Best for:** Maintaining linear history; preferred by many teams for feature branches
+
+### Merge from Command Line
+
+To merge a branch into your current branch:
+
+```bash
+$ git merge source-branch-name
+```
+
+### Abort a Merge
+
+If you start a merge and want to cancel:
+
+```bash
+$ git merge --abort
 ```
 
 ---
@@ -235,3 +399,7 @@ $ git push origin your-branch-name
 | `git reset HEAD file.js`  | Unstage a file                                    |
 | `git checkout -- file.js` | Discard changes to a file                         |
 | `git rebase main`         | Update your branch with main without merge commit |
+| `git merge branch-name`   | Merge a branch into current branch                |
+| `git merge --squash`      | Squash all commits before merging                 |
+| `git merge --no-ff`       | Force merge commit even if fast-forward possible  |
+| `git merge --abort`       | Cancel an in-progress merge                       |
